@@ -1,12 +1,58 @@
 import streamlit as st
 import pandas as pd
 import uuid 
+import json
+import os
+
+QUOTE_FILE = "quotes.json"
+
+def load_quotes():
+    if os.path.exists(QUOTE_FILE):
+        with open(QUOTE_FILE, "r") as f:
+            return json.load(f)
+    return []
+
+def save_quote(quote):
+    quotes = load_quotes()
+    quotes.append(quote)
+
+    with open(QUOTE_FILE, "w") as f:
+        json.dump(quotes, f, indent=4)
+
 page = st.sidebar.selectbox(
     "Navigation",
     ["Create Quote", "Quote History"]
 )
 
-quote_number = str(uuid.uuid4())[:8]
+if page == "Quote History":
+
+    st.title("Quote History")
+
+    quotes = load_quotes()
+
+def get_next_quote_number():
+    quotes = load_quotes()
+
+    if len(quotes) == 0:
+        return "Q-0001"
+
+    last_number = int(quotes[-1]["quote_number"].split("-")[1])
+    next_number = last_number + 1
+
+    return f"Q-{next_number:04d}"
+
+    if len(quotes) == 0:
+        st.info("No quotes saved yet.")
+
+    else:
+        for q in quotes:
+            st.subheader(f"Quote #{q['quote_number']}")
+            st.write(f"Client: {q['client']}")
+            st.write(f"Address: {q['address']}")
+            st.write(f"Total: ${q['total']}")
+            st.divider()
+
+quote_number = get_next_quote_number()
 
 st.markdown("""
 <style>
@@ -301,24 +347,12 @@ if st.button("Generate Quote"):
 if st.button("Save Quote"):
 
     quote_data = {
-        "Quote Number": quote_number,
-        "Workshop Labour": workshop_cost,
-        "Onsite Labour": onsite_cost,
-        "Steel Cost": steel_cost,
-        "Galvanising": galv_cost,
-        "Materials": materials,
-        "Extras": extras,
-        "Total": final_total
+        "quote_number": quote_number,
+        "client": client_name,
+        "address": address,
+        "total": total_price
     }
 
-    df = pd.DataFrame([quote_data])
+    save_quote(quote_data)
 
-    try:
-        existing = pd.read_csv("quotes.csv")
-        df = pd.concat([existing, df], ignore_index=True)
-    except:
-        pass
-
-    df.to_csv("quotes.csv", index=False)
-
-    st.success("Quote saved successfully!")
+    st.success(f"Quote {quote_number} saved!")

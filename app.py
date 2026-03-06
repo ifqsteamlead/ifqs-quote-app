@@ -1,5 +1,12 @@
 import streamlit as st
 import pandas as pd
+import uuid 
+page = st.sidebar.selectbox(
+    "Navigation",
+    ["Create Quote", "Quote History"]
+)
+
+quote_number = str(uuid.uuid4())[:8]
 
 st.markdown("""
 <style>
@@ -50,6 +57,7 @@ st.image("aks logo.jpg", width=200)
 
 st.title("Fabrication Quote Builder")
 st.caption("Material • Labour • Galvanising Estimator")
+st.subheader(f"Quote Number: {quote_number}")
 st.divider()
 
 steel_sections = {
@@ -289,3 +297,28 @@ st.subheader(f"Final Quote (with {markup}% markup): ${final_total:,.2f}")
 
 if st.button("Generate Quote"):
     st.success("Quote Generated")
+
+if st.button("Save Quote"):
+
+    quote_data = {
+        "Quote Number": quote_number,
+        "Workshop Labour": workshop_cost,
+        "Onsite Labour": onsite_cost,
+        "Steel Cost": steel_cost,
+        "Galvanising": galv_cost,
+        "Materials": materials,
+        "Extras": extras,
+        "Total": final_total
+    }
+
+    df = pd.DataFrame([quote_data])
+
+    try:
+        existing = pd.read_csv("quotes.csv")
+        df = pd.concat([existing, df], ignore_index=True)
+    except:
+        pass
+
+    df.to_csv("quotes.csv", index=False)
+
+    st.success("Quote saved successfully!")

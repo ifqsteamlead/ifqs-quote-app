@@ -45,6 +45,18 @@ def save_quote(quote):
     with open(QUOTE_FILE, "w") as f:
         json.dump(quotes, f, indent=4)
 
+def get_next_quote_number():
+    quotes = load_quotes()
+
+    if len(user_quotes) == 0:
+        return "Q-0001"
+    last_quote = quotes[-1]["quote_number"]
+    last_number = int(last_quote.split("-")[1])
+
+    next_number = last_number + 1
+
+    return f"Q-{next_number:04d}"
+
 page = st.sidebar.selectbox(
     "Navigation",
     ["Create Quote", "Quote History"]
@@ -54,7 +66,6 @@ if page == "Quote History":
 
     st.title("Quote History")
 
-    quotes = load_quotes()
 
     user_quotes = [q for q in quotes if q["user"] == st.session_state.user]
 

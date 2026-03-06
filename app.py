@@ -48,8 +48,9 @@ def save_quote(quote):
 def get_next_quote_number():
     quotes = load_quotes()
 
-    if len(user_quotes) == 0:
+    if len(quotes) == 0:
         return "Q-0001"
+
     last_quote = quotes[-1]["quote_number"]
     last_number = int(last_quote.split("-")[1])
 
@@ -61,11 +62,19 @@ page = st.sidebar.selectbox(
     "Navigation",
     ["Create Quote", "Quote History"]
 )
+if page == "Create Quote":
 
+    quote_number = get_next_quote_number()
+
+    st.image("aks logo.jpg", width=200)
+
+    st.title("Fabrication Quote Builder")
+    
 if page == "Quote History":
 
     st.title("Quote History")
-
+    
+    quotes = load_quotes()
 
     user_quotes = [q for q in quotes if q["user"] == st.session_state.user]
 
@@ -384,12 +393,12 @@ if st.button("Generate Quote"):
 if st.button("Save Quote"):
 
     quote_data = {
-    "user": st.session_state.user,
-    "quote_number": quote_number,
-    "client": client_name,
-    "address": address,
-    "total": total_price
-}
+        "user": st.session_state.user,
+        "quote_number": quote_number,
+        "client": client,
+        "job": job,
+        "total": final_total
+    }
 
     save_quote(quote_data)
 

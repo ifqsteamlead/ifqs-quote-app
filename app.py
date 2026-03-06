@@ -214,9 +214,14 @@ total_weight = sum(item["weight"] for item in steel_items)
 
 tonnes = total_weight / 1000
 
+galvanised = st.checkbox("Hot Dip Galvanised")
+
 galv_price_per_tonne = 1800
 
-galv_cost = tonnes * galv_price_per_tonne
+if galvanised:
+    galv_cost = tonnes * galv_price_per_tonne
+else:
+    galv_cost = 0
 
 st.header("Extras")
 

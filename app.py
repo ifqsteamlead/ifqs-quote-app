@@ -30,29 +30,27 @@ if page == "Quote History":
 
     quotes = load_quotes()
 
-def get_next_quote_number():
-    quotes = load_quotes()
-
-    if len(quotes) == 0:
-        return "Q-0001"
-
-    last_number = int(quotes[-1]["quote_number"].split("-")[1])
-    next_number = last_number + 1
-
-    return f"Q-{next_number:04d}"
-
     if len(quotes) == 0:
         st.info("No quotes saved yet.")
 
     else:
-        for q in quotes:
-            st.subheader(f"Quote #{q['quote_number']}")
-            st.write(f"Client: {q['client']}")
-            st.write(f"Address: {q['address']}")
-            st.write(f"Total: ${q['total']}")
-            st.divider()
 
-quote_number = get_next_quote_number()
+        quote_numbers = [q["quote_number"] for q in quotes]
+
+        selected_quote = st.selectbox(
+            "Select a Quote",
+            quote_numbers
+        )
+
+        selected_data = next(
+            q for q in quotes if q["quote_number"] == selected_quote
+        )
+
+        st.subheader(f"Quote {selected_data['quote_number']}")
+
+        st.write(f"Client: {selected_data['client']}")
+        st.write(f"Address: {selected_data['address']}")
+        st.write(f"Total: ${selected_data['total']}")
 
 st.markdown("""
 <style>

@@ -348,9 +348,8 @@ if st.button("Save Quote"):
 
     quote_data = {
         "quote_number": quote_number,
-        "client": client_name,
-        "address": address,
-        "total": total_price
+        "client": client,
+        "total": total
     }
 
     save_quote(quote_data)

@@ -4,6 +4,32 @@ import uuid
 import json
 import os
 
+USERS = {
+    "dean": "1234",
+    "workshop": "steel",
+    "admin": "admin"
+}
+
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+
+if not st.session_state.logged_in:
+
+    st.title("Login")
+
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+
+    if st.button("Login"):
+        if username in USERS and USERS[username] == password:
+            st.session_state.logged_in = True
+            st.session_state.user = username
+            st.rerun()
+        else:
+            st.error("Invalid login")
+
+    st.stop()
+
 QUOTE_FILE = "quotes.json"
 
 def load_quotes():
@@ -30,12 +56,14 @@ if page == "Quote History":
 
     quotes = load_quotes()
 
+    user_quotes = [q for q in quotes if q["user"] == st.session_state.user]
+
     if len(quotes) == 0:
         st.info("No quotes saved yet.")
 
     else:
 
-        quote_numbers = [q["quote_number"] for q in quotes]
+        quote_numbers = [q["quote_number"] for q in user_quotes]
 
         selected_quote = st.selectbox(
             "Select a Quote",
@@ -345,10 +373,12 @@ if st.button("Generate Quote"):
 if st.button("Save Quote"):
 
     quote_data = {
-        "quote_number": quote_number,
-        "client": client,
-        "total": total
-    }
+    "user": st.session_state.user,
+    "quote_number": quote_number,
+    "client": client_name,
+    "address": address,
+    "total": total_price
+}
 
     save_quote(quote_data)
 
